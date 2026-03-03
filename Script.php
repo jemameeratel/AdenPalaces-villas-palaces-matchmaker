@@ -63,6 +63,7 @@
     .wizard-body {
       padding: 25px;
       min-height: 380px; 
+      position: relative;
     }
 
     .quiz-step { display: none; animation: fadeIn 0.4s; }
@@ -158,6 +159,19 @@
     .btn-prev:disabled { opacity: 0.5; cursor: not-allowed; }
     .btn-next { background: var(--q-secondary); color: white; }
     
+    /* Error Message Style */
+    .error-message {
+      display: none;
+      background: #fde8e8;
+      color: #c53030;
+      border: 1px solid #feb2b2;
+      padding: 12px;
+      border-radius: 8px;
+      text-align: center;
+      font-weight: bold;
+      margin-top: 20px;
+      animation: fadeIn 0.3s;
+    }
   
     .winner-card {
       background: white;
@@ -451,7 +465,7 @@
             <label class="check-label">
               <input type="checkbox" onchange="toggleSelect(this, 'w_living_low')">
               <span class="custom-checkbox"></span>
-              صالة معيشة سفلية
+              معيشة سفلية
             </label>
             <select id="w_living_low" class="custom-select" disabled onchange="calculateRealTime()">
               <option value="1">1</option><option value="2">2</option>
@@ -461,7 +475,7 @@
             <label class="check-label">
               <input type="checkbox" onchange="toggleSelect(this, 'w_living_up')">
               <span class="custom-checkbox"></span>
-              صالة معيشة علوية
+              معيشة علوية
             </label>
             <select id="w_living_up" class="custom-select" disabled onchange="calculateRealTime()">
               <option value="1">1</option><option value="2">2</option>
@@ -497,7 +511,7 @@
             <label class="check-label">
               <input type="checkbox" onchange="toggleSelect(this, 'w_kit_ind')">
               <span class="custom-checkbox"></span>
-              مطبخ مغلق
+              مطبخ مستقل (مغلق)
             </label>
             <select id="w_kit_ind" class="custom-select" disabled onchange="calculateRealTime()">
               <option value="1">1</option><option value="2">2</option>
@@ -524,6 +538,10 @@
                <button class="nav-btn btn-next" type="button" onclick="location.reload()">ابدأ من جديد</button>
              </div>
            </div>
+        </div>
+        
+        <div id="step-error" class="error-message">
+          يرجى تحديد خيار واحد على الأقل للمتابعة.
         </div>
 
       </div>
@@ -570,6 +588,10 @@
         el.disabled = true;
         row.classList.remove('active');
       }
+      
+      // Hide error message as soon as user checks a box
+      document.getElementById('step-error').style.display = 'none';
+      
       calculateRealTime();
     }
 
@@ -578,6 +600,25 @@
     const totalSteps = 4; 
 
     function changeStep(direction) {
+      const errorMsg = document.getElementById('step-error');
+
+      // --- VALIDATION LOGIC ---
+      // If moving forward (direction === 1) and we are on an input step
+      if (direction === 1 && currentStep <= totalSteps) {
+          const currentStepDiv = document.getElementById(`step-${currentStep}`);
+          const checkedBoxes = currentStepDiv.querySelectorAll('input[type="checkbox"]:checked');
+          
+          if (checkedBoxes.length === 0) {
+              // Show error message and stop
+              errorMsg.style.display = 'block';
+              return; 
+          }
+      }
+      
+      // Clear error message when successfully navigating
+      errorMsg.style.display = 'none';
+      // --- END VALIDATION LOGIC ---
+
       if (currentStep + direction > totalSteps) {
          document.getElementById(`step-${currentStep}`).classList.remove('active');
          currentStep = 5; 
@@ -687,7 +728,7 @@
             desc: "فيلا الفيروز مع جناح خاص."
         },
 
-      
+        
         {
             name: "فيلا العقيق - نموذج A",
             image: "https://www.adenpalaces.com/wp-content/uploads/2026/02/AL-Aqiq.webp",
@@ -724,7 +765,7 @@
             desc: "فيلا العقيق بتوزيع اقتصادي."
         },
 
-      
+        
         {
             name: "قصر الكريستال - نموذج A",
             image: "https://www.adenpalaces.com/wp-content/uploads/2026/02/AL-Crystal.webp",
@@ -747,7 +788,7 @@
             desc: "قصر الكريستال مع استوديوهات مزدوجة."
         },
 
-      
+        
         {
             name: "فيلا الجاد - نموذج A",
             image: "https://www.adenpalaces.com/wp-content/uploads/2026/02/AL-Jaad.webp",
@@ -868,14 +909,12 @@
       document.getElementById('res-desc').innerText = winner.desc;
       document.getElementById('res-img').src = winner.image;
       
-      // Removed emojis from string templates
       let tagsHtml = `<span class="stat-tag">${totalRooms} غرف نوم</span>`;
       if(winner.stats.pool) tagsHtml += `<span class="stat-tag">مسبح</span>`;
       if(winner.stats.kit_open) tagsHtml += `<span class="stat-tag">مطبخ مفتوح</span>`;
       
       document.getElementById('res-stats').innerHTML = tagsHtml;
       
-      // Added Link Button
       actionDiv.innerHTML = `<a href="${winner.link}" class="winner-link-btn" target="_blank">عرض التفاصيل</a>`;
       
       const runnersUp = results.filter(model => model.name !== winner.name).slice(0, 2);
@@ -886,7 +925,6 @@
           
           suggGrid.innerHTML = runnersUp.map(model => {
               const r = (model.stats.master||0) + (model.stats.standard||0) + (model.stats.master_dress||0) + (model.stats.suite||0);
-              // Suggestions are now clickable links
               return `
                 <a class="suggestion-card" href="${model.link}" target="_blank">
                   <img class="suggestion-img" src="${model.image}" alt="${model.name}">
