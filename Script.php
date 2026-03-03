@@ -451,7 +451,7 @@
             <label class="check-label">
               <input type="checkbox" onchange="toggleSelect(this, 'w_living_low')">
               <span class="custom-checkbox"></span>
-              معيشة سفلية
+              صالة معيشة سفلية
             </label>
             <select id="w_living_low" class="custom-select" disabled onchange="calculateRealTime()">
               <option value="1">1</option><option value="2">2</option>
@@ -461,7 +461,7 @@
             <label class="check-label">
               <input type="checkbox" onchange="toggleSelect(this, 'w_living_up')">
               <span class="custom-checkbox"></span>
-              معيشة علوية
+              صالة معيشة علوية
             </label>
             <select id="w_living_up" class="custom-select" disabled onchange="calculateRealTime()">
               <option value="1">1</option><option value="2">2</option>
@@ -497,7 +497,7 @@
             <label class="check-label">
               <input type="checkbox" onchange="toggleSelect(this, 'w_kit_ind')">
               <span class="custom-checkbox"></span>
-              مطبخ مستقل (مغلق)
+              مطبخ مغلق
             </label>
             <select id="w_kit_ind" class="custom-select" disabled onchange="calculateRealTime()">
               <option value="1">1</option><option value="2">2</option>
